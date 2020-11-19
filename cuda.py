@@ -18,7 +18,8 @@ class cuda(Task.Task):
 
 @extension('.cu', '.cuda')
 def c_hook(self, node):
-    return self.create_compiled_task('cuda', node)
+    if getattr(self.env, 'HAVE_CUDA', False):
+        return self.create_compiled_task('cuda', node)
 
 @extension('.cxx')
 def cxx_hook(self, node):
@@ -34,7 +35,7 @@ def options(opt):
 def configure(cfg):
 
     generic._configure(cfg, "CUDA", mandatory=False,
-                       incs=["cuda.h"], libs=["cuda","cudart"], bins=["nvcc"])
+                       incs=["cuda.h"], libs=["cuda","cudart","curand"], bins=["nvcc"])
 
     if not 'HAVE_CUDA' in cfg.env:
         return
