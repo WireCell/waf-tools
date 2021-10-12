@@ -14,5 +14,6 @@ def configure(cfg):
                        incs=["torch/script.h"],
                        libs=libs,
                        mandatory=False)
-    setattr(cfg.env, 'LINKFLAGS_LIBTORCH',
-            ['-Wl,--no-as-needed,-ltorch_cuda','-Wl,--as-needed'])
+    if 'torch_cuda' in libs:
+        setattr(cfg.env, 'LINKFLAGS_LIBTORCH',
+                ['-Wl,--no-as-needed,-ltorch_cuda','-Wl,--as-needed'])
