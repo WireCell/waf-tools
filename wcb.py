@@ -29,7 +29,6 @@ package_descriptions = [
     ('TBB',      dict(incs=["tbb/parallel_for.h"], libs=['tbb'], mandatory=False)),
     ('HDF5',     dict(incs=["hdf5.h"], libs=['hdf5'], mandatory=False)),
     ('H5CPP',    dict(incs=["h5cpp/all"], mandatory=False, extuses=('HDF5',))),
-    ('LibTorch', dict(incs=["torch/script.h"], libs=['torch', 'c10'], mandatory=False)),
 
     ('ZMQ',      dict(incs=["zmq.h"], libs=['zmq'], pcname='libzmq', mandatory=False)),
     ('CZMQ',     dict(incs=["czmq.h"], libs=['czmq'], pcname='libczmq', mandatory=False)),
@@ -48,6 +47,7 @@ def options(opt):
     opt.load('boost')
     opt.load('smplpkgs')
     opt.load('rootsys')
+    opt.load('libtorch')
     opt.load('cuda')
     opt.load('kokkos')
     #opt.load('protobuf')
@@ -78,6 +78,11 @@ def configure(cfg):
         #print ("Configure: %s %s" % (name, args))
         generic._configure(cfg, name, **args)
         #print ("configured %s" % name)
+
+    if getattr(cfg.options, "with_libtorch", False) is False:
+        print ("sans libtorch")
+    else:
+        cfg.load('libtorch')
 
     if getattr(cfg.options, "with_cuda", False) is False:
         print ("sans CUDA")
