@@ -37,15 +37,19 @@ use explicit --with-NAME=[<bool>|<dir>].
 
 import sys
 import os.path as osp
-def _options(opt, name):
+def _options(opt, name, incs=None, libs=None):
     lower = name.lower()
     opt = opt.add_option_group('%s Options' % name)
     opt.add_option('--with-%s'%lower, type='string', default=None,
                    help="give %s installation location" % name)
-    opt.add_option('--with-%s-include'%lower, type='string', 
-                   help="give %s include installation location"%name)
-    opt.add_option('--with-%s-lib'%lower, type='string', 
-                   help="give %s lib installation location"%name)
+    if incs is None or len(incs):
+        opt.add_option('--with-%s-include'%lower, type='string', 
+                       help="give %s include installation location"%name)
+    if libs is None or len(libs):
+        opt.add_option('--with-%s-lib'%lower, type='string', 
+                       help="give %s lib installation location"%name)
+        opt.add_option('--with-%s-libs'%lower, type='string', 
+                       help="list %s link libraries"%name)
     return
 
 def _configure(ctx, name, incs=(), libs=(), bins=(), pcname=None, mandatory=True, extuses=()):
@@ -59,6 +63,11 @@ def _configure(ctx, name, incs=(), libs=(), bins=(), pcname=None, mandatory=True
     incdir = getattr(ctx.options, 'with_%s_include'%lower, None)
     libdir = getattr(ctx.options, 'with_%s_lib'%lower, None)
     bindir = getattr(ctx.options, 'with_%s_bin'%lower, None)
+    if libs:
+        maybe = getattr(ctx.options, 'with_%s_libs'%lower, None)
+        if maybe:
+            libs = [s.strip() for s in maybe.split(",") if s.strip()]
+    
     #print ("CONFIGURE", name, instdir, incdir, libdir, mandatory, extuses)
 
     if mandatory:

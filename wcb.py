@@ -23,11 +23,12 @@ package_descriptions = [
 
     ('Eigen',    dict(incs=["Eigen/Dense"], pcname='eigen3')),
 
-    ('Jsonnet',  dict(incs=["libjsonnet++.h"], libs=['jsonnet++','jsonnet'])),
+    # for faster parsing, consider:
+    # ./wcb configure --with-jsonnet-libs=gojsonnet 
+    ('Jsonnet',  dict(incs=["libjsonnet.h"], libs=['jsonnet'])),
     ('TBB',      dict(incs=["tbb/parallel_for.h"], libs=['tbb'], mandatory=False)),
     ('HDF5',     dict(incs=["hdf5.h"], libs=['hdf5'], mandatory=False)),
     ('H5CPP',    dict(incs=["h5cpp/all"], mandatory=False, extuses=('HDF5',))),
-    ('LibTorch', dict(incs=["torch/script.h"], libs=['torch', 'c10'], mandatory=False)),
 
     ('ZMQ',      dict(incs=["zmq.h"], libs=['zmq'], pcname='libzmq', mandatory=False)),
     ('CZMQ',     dict(incs=["czmq.h"], libs=['czmq'], pcname='libczmq', mandatory=False)),
@@ -46,12 +47,15 @@ def options(opt):
     opt.load('boost')
     opt.load('smplpkgs')
     opt.load('rootsys')
+    opt.load('libtorch')
     opt.load('cuda')
     opt.load('kokkos')
     #opt.load('protobuf')
 
     for name,desc in package_descriptions:
-        generic._options(opt, name)
+        generic._options(opt, name,
+                         desc.get("incs", None),
+                         desc.get("libs", None))
 
     opt.add_option('--build-debug', default='-O2 -ggdb3',
                    help="Build with debug symbols")
@@ -74,6 +78,11 @@ def configure(cfg):
         #print ("Configure: %s %s" % (name, args))
         generic._configure(cfg, name, **args)
         #print ("configured %s" % name)
+
+    if getattr(cfg.options, "with_libtorch", False) is False:
+        print ("sans libtorch")
+    else:
+        cfg.load('libtorch')
 
     if getattr(cfg.options, "with_cuda", False) is False:
         print ("sans CUDA")

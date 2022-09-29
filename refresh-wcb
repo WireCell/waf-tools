@@ -103,7 +103,9 @@ done
 
 pushd "$wafdir" > /dev/null
 #python waf-light --python=python2 --tools=$toolflags
-python2 ./waf-light configure build --tools=$toolflags
+#python2 ./waf-light configure build --tools=$toolflags
+## python2 is dead, get over it
+python ./waf-light configure build --tools=$toolflags
 popd > /dev/null
 echo "built waf with tools: $toolflags"
 # echo 'WARNING: forcing python2.  See GitHub Issue #8'
