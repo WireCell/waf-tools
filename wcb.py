@@ -4,6 +4,7 @@
 from . import generic
 import os.path as osp
 from waflib.Utils import to_list
+from waflib.Logs import debug, info, error, warn
 
 mydir = osp.dirname(__file__)
 
@@ -157,12 +158,19 @@ def configure(cfg):
                 submodules.remove(pkg)
 
     cfg.env.SUBDIRS = submodules
-    print ('Configured for submodules: %s' % (', '.join(submodules), ))
-    cfg.write_config_header('config.h')
+    info ('Configured for submodules: %s' % (', '.join(submodules), ))
+    bch = 'WireCellUtil/BuildConfig.h' 
+    cfg.env['BuildConfig'] = bch
+    info ('Writing build config: %s' % bch) 
+    cfg.write_config_header(bch)
+
     #print(cfg.env)
 
 def build(bld):
     bld.load('smplpkgs')
+
+    bch = bld.path.find_or_declare(bld.env.BuildConfig)
+    bld.install_files('${PREFIX}/include/' + bch.parent.name, bch)
 
     subdirs = bld.env.SUBDIRS
     print ('Building: %s' % (', '.join(subdirs), ))
